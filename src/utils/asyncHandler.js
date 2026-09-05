@@ -5,4 +5,4 @@ const asyncHandler = (requestHandler)=>{
 
     }
 }
-export default asycnHandler 
+export default asyncHandler 
