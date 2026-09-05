@@ -1,0 +1,9 @@
+{
+    "singleBrackets" : false ,
+    "tabWidth" : 2 , 
+    "useTab" : false , 
+    "trailingComma": "all" ,
+    "semi" : true , 
+    "bracketSpacing" : true  
+
+}
