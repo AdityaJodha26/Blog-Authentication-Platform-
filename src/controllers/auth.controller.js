@@ -103,5 +103,30 @@ const login = asyncHandler(async(req, res ,next)=>{
             
 
 })
+const logout = asyncHandler(async(req  , res , next)=>{
+    await User.findByIdAndUpdate(
+        {
+            $set:{
+                refreshToken: ""
+            }
+        }, 
+        {
+            new :true , 
+        }
+    )
 
-export {registerUser}
+    const options = {
+        https:true , 
+        secure:true , 
+    }
+
+    return res  
+            .status(200) 
+            .clearCookie("accessToken" , accessToken) 
+            .clearCookie("refreshToken" , cookie) 
+            .json({
+                success: true ,
+                message: "User logged Out successfully"
+            })            
+})
+export {registerUser , login , logout}

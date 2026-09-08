@@ -7,5 +7,6 @@ const router = Router()
 
 router.route("/register").post(userRegisterValidator() , validate , registerUser)  
 router.route("/login").post(userRegisterValidator() , validate , login)  
+router.route("/logout").post(verifyJWT , logout)  
 
 export default router
