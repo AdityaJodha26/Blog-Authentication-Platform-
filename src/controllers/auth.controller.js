@@ -7,6 +7,7 @@ import {User} from "../models/user.models.js"
 import crypto from "crypto"
 
 const generateAccessAndRefreshToken = async(userId)=>{
+  
     try{
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
@@ -17,7 +18,8 @@ const generateAccessAndRefreshToken = async(userId)=>{
         return {accessToken , refreshToken}
     }
     catch(err){
-        throw new ApiErrors(500 , "Something went wrong while generating access and refresh Token")
+        console.log("error is there " ,err) ; 
+        throw new ApiErrors(500 , "Something went really wrong while generating access and refresh Token")
 
     }
 
@@ -80,6 +82,7 @@ const login = asyncHandler(async(req, res ,next)=>{
     if(!user){
         throw new ApiErrors(404 , "User not found")
     }
+    
 
     const isPasswordValid = await user.isPasswordCorrect(password)
 
@@ -87,7 +90,7 @@ const login = asyncHandler(async(req, res ,next)=>{
         throw new ApiErrors(402, "Password is not Correct")
     }
 
-    const{ accessToken , refreshToken } = await generateAccessAndRefreshToken(user?._id) ;
+    const{ accessToken , refreshToken } = await generateAccessAndRefreshToken(user._id) ;
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken -emailVerificationToken -emailVerificationExpiry")
 
@@ -124,8 +127,8 @@ const logout = asyncHandler(async(req  , res , next)=>{
 
     return res  
             .status(200) 
-            .clearCookie("accessToken" , accessToken) 
-            .clearCookie("refreshToken" , cookie) 
+            .clearCookie("accessToken") 
+            .clearCookie("refreshToken") 
             .json({
                 success: true ,
                 message: "User logged Out successfully"
@@ -316,12 +319,12 @@ const resetPassword = asyncHandler(async(req ,res)=>{
 
 const changePassword = asyncHandler(async(req, res)=>{
     const {oldPassword , newPassword} = req.body 
-    const user = await User.findById(user?.id)
+    const user = await User.findById(req.user?._id)
     if(!user){
         throw new ApiErrors(404 ,"User not found")
     }
 
-    const isPasswordValid = await User.isPasswordCorrect(oldPassword)
+    const isPasswordValid = await user.isPasswordCorrect(oldPassword)
     if(!isPasswordValid){
         throw new ApiErrors(400 , "Password is not correct")
     }

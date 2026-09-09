@@ -12,9 +12,9 @@ export const verifyJWT = asyncHandler(async(req , res , next)=>{
 
     try{
         const decodedToken = await jwt.verify(token , process.env.ACCESS_TOKEN_SECRET) 
-        
-        const user = await User.findById(decodedToken?.id).select("-password  refreshToken emailVerificationToken emailVerificationExpiry")
-
+        console.log(decodedToken)
+        const user = await User.findById(decodedToken?._id).select("-password  -refreshToken  -emailVerificationToken -emailVerificationExpiry")
+        console.log(user)
         if(!user){
             throw new ApiErrors(401 , " User not valid")
 

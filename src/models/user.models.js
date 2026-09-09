@@ -34,7 +34,7 @@ const userSchema = new Schema({
     fullname:{
         type:String , 
         trim:true ,
-        required:true ,
+        
     }
     ,
     password:{
@@ -52,11 +52,11 @@ const userSchema = new Schema({
     }
     ,
     forgotPasswordExpiry:{
-        type:String
+        type:Date
     }
     ,
     forgotPasswordToken:{
-        type:Date , 
+        type:String , 
     },
     emailVerificationToken:{
         type:String
@@ -71,9 +71,14 @@ const userSchema = new Schema({
 userSchema.pre("save" , async function(){
     if(!this.isModified("password")) return ;
     this.password = await bcrypt.hash(this.password , 10)
+
 }) // works just after user registration
 
-userSchema.generateAccessToken = function(){
+userSchema.methods.isPasswordCorrect = async function(password){
+    return await bcrypt.compare(password , this.password)
+}
+
+userSchema.methods.generateAccessToken = function(){
     return jwt.sign({
         _id:this.id , 
         email:this.email , 
@@ -84,7 +89,7 @@ userSchema.generateAccessToken = function(){
 )
 }
 
-userSchema.generateRefreshToken = function(){
+userSchema.methods.generateRefreshToken = function(){
     return jwt.sign({
         _id: this.id ,
     },
@@ -95,16 +100,14 @@ userSchema.generateRefreshToken = function(){
 )
 }
 
-userSchema.generateTemporaryToken = function(){
+userSchema.methods.generateTemporaryToken = function(){
     const unhashedToken = crypto.randomBytes(20).toString("hex")
     const hashedToken = crypto.createHash("sha256").update(unhashedToken).digest("hex");
-    const tokenExpiry = Date.now() + (34*43*10) ;
+    const tokenExpiry = Date.now() + (34*43*1000) ;
     return {unhashedToken , hashedToken , tokenExpiry} ;
 }
 
-userSchema.methods.isPasswordCorrect = async function(password){
-    return await bcrypt.compare(password , this.password)
-}
+
 
 
 

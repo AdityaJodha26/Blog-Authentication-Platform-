@@ -47,12 +47,12 @@ const userLoginValidator = () =>{
     ]
 }
 const userChangeCurrentPasswordValidator = () =>{
-    return []
+    return [
         body("oldPassword").notEmpty().withMessage("Old Password is required") 
         ,
         body("newPassword").notEmpty().withMessage("New Password is required")
 
-
+    ]
 }
 
 const userForgotPasswordValidator = ()=>{
