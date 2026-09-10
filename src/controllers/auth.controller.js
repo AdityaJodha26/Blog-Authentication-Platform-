@@ -5,6 +5,8 @@ import {sendMail , emailVerificationMailgenContent, forgotPasswordMailgenContent
 import jwt from "jsonwebtoken" 
 import {User} from "../models/user.models.js"
 import crypto from "crypto"
+import { cloudinary } from "../utils/cloudinary.js"
+import fs from "fs" 
 
 const generateAccessAndRefreshToken = async(userId)=>{
   
@@ -336,5 +338,75 @@ const changePassword = asyncHandler(async(req, res)=>{
             .status(200)
             .json( new ApiResponse(200 , {} , "Password Changed Successfully"))
 })
+const updateProfile =asyncHandler(async(req ,res)=>{
+    const {fullname , username  , bio} = req.body 
+    const user = await User.findById(req.user._id) 
+    if(!user){
+        throw new ApiErrors(404 , "User not found")
+    }
+    if(fullname !== undefined){
+        user.fullname = fullname 
+    }
+    if(username !== undefined){
+        user.username = username 
+    }
+    if(bio !== undefined){
+        user.bio = bio
+    }
+    await user.save({validateBeforeSave : false})
+    const updatedUser = await User.findById(user._id).select("-password -emailVerificationToken -emailVerificationExpiry -refreshToken")
 
-export {registerUser , login , logout, verifyEmail , getCurrentUser , resendEmailVerification ,refreshAccessToken , forgotPassword , resetPassword ,changePassword }
+    return res  
+            .status(200) 
+            .json(new ApiResponse(200 , updatedUser , "Profile Updated Successfully"))
+    
+})
+
+const updateAvatar = asyncHandler(async(req ,res )=>{
+    if(!req.file){
+        throw new ApiErrors(400 , "Avatar file is required")
+    }
+
+    const localFilePath = req.file.path 
+
+    
+  
+    const response = await cloudinary.uploader.upload(
+        localFilePath,
+        {
+            resource_type: "image",
+            folder: "blog-platform/avatars"
+        }
+    );
+
+   
+
+
+    if(!response){
+        throw new ApiErrors(404 , "File not uploaded")
+    }
+
+    const user = await User.findById(req.user._id)
+    if(!user){
+        throw new ApiErrors(404 , "User not found") 
+    }
+    
+    user.avatar = {
+        url : response.secure_url ,
+        public_id: response.public_id 
+
+    }
+    await user.save({validateBeforeSave : false })
+
+    fs.unlinkSync(localFilePath)
+
+    return res     
+            .status(200) 
+            .json(new ApiResponse(200 ,user.avatar , "Avatar Uploaded Successfully"))
+
+
+
+    
+
+})
+export {registerUser ,updateProfile,updateAvatar ,  login , logout, verifyEmail , getCurrentUser , resendEmailVerification ,refreshAccessToken , forgotPassword , resetPassword ,changePassword }

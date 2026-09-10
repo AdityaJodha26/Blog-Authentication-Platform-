@@ -7,7 +7,7 @@ class ApiErrors
                 this.data = null ; 
                 this.message = message ; 
                 this.errors = errors;
-                this.success = "false" ;  
+                this.success = false ;  
             }
 
             if(stack){

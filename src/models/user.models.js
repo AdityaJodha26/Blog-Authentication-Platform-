@@ -2,16 +2,17 @@ import mongoose,{Schema} from "mongoose"
 import bcrypt from "bcrypt" 
 import crypto from "crypto" 
 import jwt from "jsonwebtoken"
+import { kMaxLength } from "buffer"
 
 const userSchema = new Schema({
     avatar:{
         type:{
             url: String , 
-            localPath: String , 
+            public_id: String , 
         },
         default:{
             url:`https://www.istockphoto.com/illustrations/default-user-icon` , 
-            localPath:"" , 
+            public_id:"" , 
         }
 
     },
@@ -29,6 +30,11 @@ const userSchema = new Schema({
         unique:true ,
         lowercase:true ,
         trim:true ,
+    },
+    bio:{
+        type:String ,
+        trim : true , 
+        maxlength:160 
     }
     ,
     fullname:{
