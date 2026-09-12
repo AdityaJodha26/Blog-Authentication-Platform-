@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {createPost , getAllPost, getPostBySlug} from "../controllers/post.controller.js"
+import {createPost , getAllPost, getPostBySlug , updatePost} from "../controllers/post.controller.js"
 import { createBlogValidator } from "../validators/index.js";
 import {verifyJWT} from "../middleware/auth.middleware.js"
 import {validate} from "../middleware/validator.middleware.js"
@@ -15,4 +15,7 @@ router
 router
     .route("/:slug")
     .get(getPostBySlug)
+router
+    .route("/update-post/:slug")
+    .patch(verifyJWT , updatePost)
 export default router 

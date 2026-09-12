@@ -78,5 +78,33 @@ const getPostBySlug = asyncHandler(async(req,res)=>{
                 new ApiResponse(200 , post , "Post fetched successfully")
             )
 })
+const updatePost = asyncHandler(async(req ,res)=>{
+    const {slug} = req.params 
+    const {title , content , excerpt} = req.body 
+    const post = await Post.findOne({slug})
+    
+    if(!post){
+        throw new ApiErrors(404 ," Post not found")
+    }
+   
+    if(post.author.toString()!== req.user._id.toString()){
+        throw new ApiErrors(403 ,"You are not allowed to update this blog")
+    }
 
-export {createPost ,getAllPost , getPostBySlug}
+    if(title!== undefined){
+        post.title = title 
+    }
+    if(content!== undefined){
+        post.content = content 
+    }
+    if(excerpt!==undefined){
+        post.content = content
+    }
+    await post.save()
+
+    return res
+            .status(200)
+            .json(new ApiResponse(200 , post , "Post updated Successfully"))
+})
+
+export {createPost ,getAllPost , getPostBySlug , updatePost}
