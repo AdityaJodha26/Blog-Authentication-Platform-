@@ -1,5 +1,10 @@
 import express from "express" 
 import cors from "cors"
+import healthCheckRouter from "./routes/healthcheck.route.js"
+import authRoute from "./routes/auth.route.js"
+import cookieParser from "cookie-parser";
+import postRouter from "./routes/post.route.js"
+
 const app = express() ; 
 
 app.use(express.json({limit:"16kb"}))
@@ -17,12 +22,12 @@ app.use(cors({
 app.get("/" , (req ,res)=>{
     res.send("Welcome to the home page")
 })
-import healthCheckRouter from "./routes/healthcheck.route.js"
-import authRoute from "./routes/auth.route.js"
-import cookieParser from "cookie-parser";
+
 
 app.use("/api/v1/users" , authRoute)
 app.use("/api/v1/healthcheck" , healthCheckRouter)
+
+app.use("/api/v1/posts" , postRouter) 
 
 
 export default app

@@ -1,5 +1,5 @@
 import Router from "express" 
-import { UserRegisterValidator , userLoginValidator , userResetPasswordValidator ,userForgotPasswordValidator , userChangeCurrentPasswordValidator } from "../ validators/index.js"
+import { UserRegisterValidator , userLoginValidator , userResetPasswordValidator ,userForgotPasswordValidator , userChangeCurrentPasswordValidator } from "../validators/index.js"
 import { validate }  from "../middleware/validator.middleware.js"
 import { registerUser ,updateAvatar ,  login ,updateProfile , logout , verifyEmail ,getCurrentUser , changePassword , forgotPassword , resetPassword , resendEmailVerification ,refreshAccessToken } from "../controllers/auth.controller.js"
 import {verifyJWT} from "../middleware/auth.middleware.js"

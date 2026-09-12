@@ -1,0 +1,5 @@
+slug : is a user friendly version of the title (How to make friends)
+    eg - post/how-to-make-friends
+    we use a package called slugify to do this
+
+excerpt : is a small summary of the blog post which can be used to show on the home page

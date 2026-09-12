@@ -72,4 +72,22 @@ const userResetPasswordValidator = ()=>{
             .withMessage("Password is required")
     ]
 }
-export {UserRegisterValidator , userLoginValidator , userChangeCurrentPasswordValidator ,userForgotPasswordValidator , userResetPasswordValidator} 
+
+const createBlogValidator = ()=>{
+    return [
+        body("title")
+            .notEmpty()
+            .withMessage("title is required")
+            .trim() ,
+        body("content")
+            .notEmpty()
+            .withMessage("content is required")
+            ,
+        body("excerpt")
+            .notEmpty()
+            .withMessage("excerpt is also required")
+    ]
+}
+export {UserRegisterValidator , userLoginValidator , userChangeCurrentPasswordValidator ,userForgotPasswordValidator , userResetPasswordValidator
+    ,createBlogValidator
+} 

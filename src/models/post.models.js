@@ -1,12 +1,12 @@
 import mongoose,{Schema} from "mongoose";
-import { User } from "./user.models";
-import { AvailablepostStatuses, PostStatusEnum } from "../utils/constants";
+import { User } from "./user.models.js";
+import { AvailablepostStatuses, PostStatusEnum } from "../utils/constants.js";
 
 const postSchema = new Schema({
     title:{
         type:String , 
         trim:true , 
-        unique:true, 
+         
         required:true ,
         maxLength:30 , 
         minLength:3
@@ -63,4 +63,4 @@ const postSchema = new Schema({
 
 } ,{timestamps: true })
 
-export const Post = mongoose.Model("Post" , postSchema)
+export const Post = mongoose.model("Post" , postSchema)
