@@ -3,3 +3,7 @@ slug : is a user friendly version of the title (How to make friends)
     we use a package called slugify to do this
 
 excerpt : is a small summary of the blog post which can be used to show on the home page
+
+.populate() is a mongoose function which replaces object id with useful info
+in this case author object id will get replaced with username avatar etc 
+in short it fetched data using its objectId
