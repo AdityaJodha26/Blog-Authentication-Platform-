@@ -1,12 +1,14 @@
 import { Router } from "express";
-import {createPost , deletePost, getAllPost, getPostBySlug , updatePost ,publishPost, unpublishPost} from "../controllers/post.controller.js"
+import {createPost , deletePost, getAllPost, getPostBySlug , updatePost ,publishPost, unpublishPost, getMyPost} from "../controllers/post.controller.js"
 import { createBlogValidator } from "../validators/index.js";
 import {verifyJWT} from "../middleware/auth.middleware.js"
 import {validate} from "../middleware/validator.middleware.js"
 
 
 const router = Router() 
- 
+router
+    .route("/my-posts")
+    .get(verifyJWT , getMyPost)
 router
     .route("/create-post")
     .post(verifyJWT , createBlogValidator() , validate , createPost)
@@ -28,4 +30,5 @@ router
 router
     .route("/unpublish-post/:slug")
     .patch(verifyJWT , unpublishPost)
+
 export default router 

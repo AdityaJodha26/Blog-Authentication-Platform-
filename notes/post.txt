@@ -7,3 +7,25 @@ excerpt : is a small summary of the blog post which can be used to show on the h
 .populate() is a mongoose function which replaces object id with useful info
 in this case author object id will get replaced with username avatar etc 
 in short it fetched data using its objectId
+
+
+getmypost
+/my-posts
+     ↓
+filter = { author: me }
+     ↓
+All my posts
+
+
+/my-posts?status=draft
+     ↓
+filter = { author: me, status: draft }
+     ↓
+Only my drafts
+
+
+/my-posts?status=published
+     ↓
+filter = { author: me, status: published }
+     ↓
+Only my published posts

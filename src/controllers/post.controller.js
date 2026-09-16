@@ -6,6 +6,7 @@ import slugify from "slugify"
 import { AvailablepostStatuses, PostStatusEnum } from "../utils/constants.js";
 import mongoose from "mongoose";
 
+
 const createPost = asyncHandler(async(req ,res)=>{
     const {title , content , excerpt } = req.body ;
 
@@ -171,4 +172,26 @@ const unpublishPost = asyncHandler(async(req, res)=>{
         .json(new ApiResponse(200 , "Post unpublished successfully"))
 })
 
-export {createPost ,getAllPost , getPostBySlug , updatePost , deletePost , publishPost , unpublishPost}
+const getMyPost = asyncHandler(async(req ,res)=>{
+    const {status} = req.query 
+    
+    const filter ={author: req.user._id}
+
+    if(status){
+        filter.status = status 
+    }
+
+    const posts = await Post.find(filter)
+        .sort({createdAt:-1})
+
+    return res  
+            .status(200)
+            .json(new ApiResponse(200 , posts , "Post fetched successfully"))
+    
+
+
+})
+
+
+export {createPost ,getAllPost , getPostBySlug , updatePost , deletePost 
+    , publishPost , unpublishPost , getMyPost}
