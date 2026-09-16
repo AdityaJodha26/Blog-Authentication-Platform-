@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {createPost , deletePost, getAllPost, getPostBySlug , updatePost} from "../controllers/post.controller.js"
+import {createPost , deletePost, getAllPost, getPostBySlug , updatePost ,publishPost, unpublishPost} from "../controllers/post.controller.js"
 import { createBlogValidator } from "../validators/index.js";
 import {verifyJWT} from "../middleware/auth.middleware.js"
 import {validate} from "../middleware/validator.middleware.js"
@@ -24,5 +24,8 @@ router
     .delete(verifyJWT , deletePost)
 router
     .route("/publish-post/:slug")
-    .patch("verifyJWT" , publishPost)
+    .patch(verifyJWT , publishPost)
+router
+    .route("/unpublish-post/:slug")
+    .patch(verifyJWT , unpublishPost)
 export default router 

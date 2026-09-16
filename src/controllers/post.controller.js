@@ -3,7 +3,7 @@ import { ApiErrors } from "../utils/apiErrors.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { Post } from "../models/post.models.js";
 import slugify from "slugify" 
-import { PostStatusEnum } from "../utils/constants.js";
+import { AvailablepostStatuses, PostStatusEnum } from "../utils/constants.js";
 import mongoose from "mongoose";
 
 const createPost = asyncHandler(async(req ,res)=>{
@@ -150,5 +150,25 @@ const publishPost = asyncHandler(async(req ,res)=>{
             .json( new ApiResponse(200 , {} , "Post published successfully"))
 
 })
+const unpublishPost = asyncHandler(async(req, res)=>{
+    const {slug} = req.params 
+    const post = await Post.findOne({slug})
+    if(!post){
+        throw new ApiErrors(404 , "Post not found")
 
-export {createPost ,getAllPost , getPostBySlug , updatePost , deletePost , publishPost}
+    }
+
+    if(post.author.toString()!==req.user._id.toString()){
+        throw new ApiErrors(403 , "You cannot publish it ")
+    }
+
+    post.PostStatusEnum = AvailablepostStatuses.DRAFT 
+    post.publishedAt = null
+    await post.save()
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200 , "Post unpublished successfully"))
+})
+
+export {createPost ,getAllPost , getPostBySlug , updatePost , deletePost , publishPost , unpublishPost}
