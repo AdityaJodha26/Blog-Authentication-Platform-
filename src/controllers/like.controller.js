@@ -8,31 +8,32 @@ import { PostStatusEnum } from "../utils/constants.js";
 
 const toggleLike = asyncHandler(async(req , res)=>{
     const {postId} = req.params
-    const {userId} = req.user_id 
+    const userId = req.user._id 
     const post = await Post.findById(postId)
     if(!post){
         throw new ApiErrors(404 , "post not found")
 
     }if(post.status!==PostStatusEnum.PUBLISHED){
-        throw new ApiErrors(403 , "Only Published post can be liked")
+        throw new ApiErrors(400 , "Only Published post can be liked")
     }
 
-    const existingLike = Like.findOne({
-        post :postId ,
-        user : userId , 
+    const existingLike = await Like.findOne({
+      
+        author: userId , 
+        post:postId
     })
 
     if(existingLike){
-        await Like.findByIdAndDelete(existingLike_id)
+        await Like.findByIdAndDelete(existingLike._id)
         
         return res
             .status(200)
             .json(new ApiResponse(200 , {liked:false} , "Unliked successfully"))
     }
    
-    const like = Like.create({
-        postId , 
-        userId
+    const like = await Like.create({
+        post:postId ,
+        author:userId ,
     })
 
     return res
@@ -41,4 +42,28 @@ const toggleLike = asyncHandler(async(req , res)=>{
 
 })
 
-export {toggleLike}
+const getLikesDetails = asyncHandler(async(req , res)=>{
+    const {postId} = req.params 
+    const post = await Post.findById(postId)
+    if(!post){
+        throw new ApiErrors(404, "Post not found")
+
+    }
+
+    const likecount = await Like.countDocuments({
+        post:postId
+    })
+
+    const likedByCurrentUser = await Like.findOne({
+        author:req.user._id , 
+        post:  postId
+    })
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200 , {likecount , liked:!!likedByCurrentUser} , "likes details fetched successfully"))
+
+
+})
+
+export {toggleLike , getLikesDetails} 
