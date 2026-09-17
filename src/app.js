@@ -4,6 +4,7 @@ import healthCheckRouter from "./routes/healthcheck.route.js"
 import authRoute from "./routes/auth.route.js"
 import cookieParser from "cookie-parser";
 import postRouter from "./routes/post.route.js"
+import commentRouter from "./routes/comment.route.js"
 
 const app = express() ; 
 
@@ -28,6 +29,6 @@ app.use("/api/v1/users" , authRoute)
 app.use("/api/v1/healthcheck" , healthCheckRouter)
 
 app.use("/api/v1/posts" , postRouter) 
-
+app.use("/api/v1/comments" ,commentRouter)
 
 export default app
