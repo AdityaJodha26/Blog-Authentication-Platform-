@@ -52,6 +52,12 @@ const createPost = asyncHandler(async(req ,res)=>{
 
 const getAllPost = asyncHandler(async(req ,res)=>{
     const {tag , sort} = req.query ;
+
+    const page = Math.max(Math.min(parseInt(req.query.page) || 1 ),1)  
+    const limit =Math.min(Math.max(parseInt(req.query.limit) || 10 ),50)
+    const skip = (page-1)* limit
+
+
     const filter = {
         status:PostStatusEnum.PUBLISHED
     }
@@ -68,11 +74,31 @@ const getAllPost = asyncHandler(async(req ,res)=>{
         sortOptions = {views:-1}
     }
 
-    const posts = await Post.find(filter)
-    .populate("author" , "username  avatar ")
-    .sort(sortOptions)
+    const [posts , totalPosts] = await Promise.all([
+    Post.find(filter)
+        .populate("author" , "username  avatar ")
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit)
+        
+        ,
+    
+    Post.countDocuments(filter)
+    ])
 
-    return res.status(200).json(new ApiResponse(200 , posts , "all post fetched successfully"))
+    const totalPages = Math.ceil(totalPosts/limit) ;
+
+    return res.status(200).json(new ApiResponse(200 , {
+        post ,
+        pagination:{
+            currentPage: page ,
+            limit, 
+            totalPosts , 
+            totalPages,
+            nextPage: page< totalPages ,
+            previousPage: page>1 ,
+        }
+    }, "all post fetched successfully"))
     
 
     
