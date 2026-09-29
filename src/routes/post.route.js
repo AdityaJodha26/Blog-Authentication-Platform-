@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {createPost , deletePost, getAllPost, getPostBySlug , updatePost ,publishPost, unpublishPost, getMyPost} from "../controllers/post.controller.js"
+import {createPost , deletePost, getAllPost, getPostBySlug , updatePost ,publishPost, unpublishPost, getMyPost, searchPost} from "../controllers/post.controller.js"
 import { createBlogValidator } from "../validators/index.js";
 import {verifyJWT} from "../middleware/auth.middleware.js"
 import {validate} from "../middleware/validator.middleware.js"
@@ -15,6 +15,9 @@ router
 router
     .route("/get-all-post")
     .get(verifyJWT , getAllPost)
+router
+    .route("/search")
+    .get(verifyJWT , searchPost)
 router
     .route("/:slug")
     .get(getPostBySlug)

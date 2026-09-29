@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import postRouter from "./routes/post.route.js"
 import commentRouter from "./routes/comment.route.js"
 import likeRouter from "./routes/like.route.js"
+import bookmarkRouter from "./routes/bookmark.route.js"
 
 const app = express() ; 
 
@@ -32,5 +33,6 @@ app.use("/api/v1/healthcheck" , healthCheckRouter)
 app.use("/api/v1/posts" , postRouter) 
 app.use("/api/v1/comments" ,commentRouter)
 app.use("/api/v1/likes" , likeRouter) 
+app.use("/api/v1/bookmark" , bookmarkRouter)
 
 export default app

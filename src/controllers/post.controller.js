@@ -51,16 +51,35 @@ const createPost = asyncHandler(async(req ,res)=>{
 })
 
 const getAllPost = asyncHandler(async(req ,res)=>{
-    const posts = await Post.findOne({status:PostStatusEnum.PUBLISHED})
-    .populate("author" , "username fullname avatar")
-    .sort({createdAt:-1})
+    const {tag , sort} = req.query ;
+    const filter = {
+        status:PostStatusEnum.PUBLISHED
+    }
+
+    if(tag){
+        filter.tags = tag.toLowerCase();
+    }
+    let sortOptions = {createdAt:-1}
+
+    if(sort==="oldest"){
+        sortOptions = {createdAt:1}
+    }
+    if(sort === "popular"){
+        sortOptions = {views:-1}
+    }
+
+    const posts = await Post.find(filter)
+    .populate("author" , "username  avatar ")
+    .sort(sortOptions)
+
+    return res.status(200).json(new ApiResponse(200 , posts , "all post fetched successfully"))
     
 
     
 
-    return res  
-            .status(200)
-            .json( new ApiResponse(200 , posts ,"Posts fetched successfully"))
+
+
+    
 })
 
 const getPostBySlug = asyncHandler(async(req,res)=>{
@@ -191,7 +210,38 @@ const getMyPost = asyncHandler(async(req ,res)=>{
 
 
 })
+const searchPost = asyncHandler(async(req , res)=>{
+    const {q} = req.query 
+    if(!q?.trim()){
+        throw new ApiErrors(404 , "Search query is required")
+    }
 
+    const posts = await Post.find({
+        status:PostStatusEnum.PUBLISHED , 
+        $or:[
+            {
+                title:{
+                    $regex: q ,
+                    $options: "i" ,
+                },
+
+                content:{
+                    $regex:q ,
+                    $options:"i",
+                }
+                ,
+                tags:{
+                    $regex:q ,
+                    $options:"i"
+                }
+            }
+        ]
+    }).sort({createdAt:-1})
+
+    return res
+            .status(200)
+            .json(new ApiResponse(200 , posts , "Search result fetched successfully"))
+})
 
 export {createPost ,getAllPost , getPostBySlug , updatePost , deletePost 
-    , publishPost , unpublishPost , getMyPost}
+    , publishPost , unpublishPost , getMyPost ,searchPost}
