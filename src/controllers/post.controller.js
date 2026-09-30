@@ -128,13 +128,27 @@ const getAllPost = asyncHandler(async(req ,res)=>{
 const getPostBySlug = asyncHandler(async(req,res)=>{
     const {slug} = req.params
 
-    const post = await Post.findOne({slug})
+    const post = await Post.findOneAndUpdate({slug
+        ,
+        status:PostStatusEnum.PUBLISHED
+        
+    },
+    {
+        $inc:{
+            views:1
+        } 
+    } , 
+    {
+        new : true 
+    }
+)
         .populate("author","username fullname avatar")
         
     if(!post){
         throw new ApiErrors(404 , "Post not found")
 
     }
+   
     if(post.status = PostStatusEnum.DRAFT){
         if(!req.user || post.author._id.toString() !== req.user._id.toString()){
             throw new ApiErrors(404  ,"Post not found")
