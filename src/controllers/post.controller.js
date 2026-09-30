@@ -5,10 +5,22 @@ import { Post } from "../models/post.models.js";
 import slugify from "slugify" 
 import { AvailablepostStatuses, PostStatusEnum } from "../utils/constants.js";
 import mongoose from "mongoose";
+import { cloudinary } from "../utils/cloudinary.js";
 
 
 const createPost = asyncHandler(async(req ,res)=>{
     const {title , content , excerpt } = req.body ;
+    const file = req.file 
+    if(!file){
+        throw new ApiErrors (404 , "CoverImage not found")
+    }
+
+    const response = await cloudinary.uploader.upload(file.path)
+    if(!response){
+        throw new ApiErrors(500 , "File not uploaded")
+
+    }
+
 
     let slug = slugify(title , {
         lower : true , 
@@ -34,7 +46,11 @@ const createPost = asyncHandler(async(req ,res)=>{
         title ,
         slug , 
         content , 
+        coverImage:{
+            url:response.secure_url , 
+            publicId: response.public_id ,        
 
+        },
         excerpt , 
         author: req.user._id,
     })
@@ -44,6 +60,7 @@ const createPost = asyncHandler(async(req ,res)=>{
             500,"Post could not be created"
         )
     }
+
 
     return res
         .status(201)
@@ -132,15 +149,38 @@ const getPostBySlug = asyncHandler(async(req,res)=>{
 const updatePost = asyncHandler(async(req ,res)=>{
     const {slug} = req.params 
     const {title , content , excerpt} = req.body 
+    const file = req.file 
+    
+    
+
     const post = await Post.findOne({slug})
     
     if(!post){
         throw new ApiErrors(404 ," Post not found")
     }
+
    
     if(post.author.toString()!== req.user._id.toString()){
         throw new ApiErrors(403 ,"You are not allowed to update this blog")
     }
+
+    if(file){
+        const response = await cloudinary.uploader.upload(file.path)
+
+        if(!response){
+            throw new ApiErrors(500 , " File not uploaded")
+        }
+
+        if(post.coverImage?.publicId)
+            {await cloudinary.uploader.destroy(post.coverImage.publicId)}
+
+        post.coverImage({
+            url:response.secure_url ,
+            publicId: response.public_id
+        })
+    }
+    
+
 
     if(title!== undefined){
         post.title = title 
@@ -149,7 +189,7 @@ const updatePost = asyncHandler(async(req ,res)=>{
         post.content = content 
     }
     if(excerpt!==undefined){
-        post.content = content
+        post.excerpt = content
     }
     await post.save()
 
@@ -169,6 +209,9 @@ const deletePost = asyncHandler(async(req ,res)=>{
     if(post.author.toString()!==req.user._id.toString()){
         throw new ApiErrors(403 , "You are not allowed to delete this ")
     }
+
+    if(post.coverImage?.publicId)
+        {await cloudinary.uploader.destroy(post.coverImage.publicId)}
 
     await Post.deleteOne({_id : post._id}) ; 
     return res

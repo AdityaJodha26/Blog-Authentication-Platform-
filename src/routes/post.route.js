@@ -3,6 +3,7 @@ import {createPost , deletePost, getAllPost, getPostBySlug , updatePost ,publish
 import { createBlogValidator } from "../validators/index.js";
 import {verifyJWT} from "../middleware/auth.middleware.js"
 import {validate} from "../middleware/validator.middleware.js"
+import { upload } from "../middleware/multer.middleware.js";
 
 
 const router = Router() 
@@ -11,7 +12,7 @@ router
     .get(verifyJWT , getMyPost)
 router
     .route("/create-post")
-    .post(verifyJWT , createBlogValidator() , validate , createPost)
+    .post(verifyJWT , createBlogValidator() , validate , upload.single("coverImage"), createPost)
 router
     .route("/get-all-post")
     .get(verifyJWT , getAllPost)

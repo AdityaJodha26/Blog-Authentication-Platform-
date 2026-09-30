@@ -1,7 +1,7 @@
 import Router from "express" 
 import { UserRegisterValidator , userLoginValidator , userResetPasswordValidator ,userForgotPasswordValidator , userChangeCurrentPasswordValidator } from "../validators/index.js"
 import { validate }  from "../middleware/validator.middleware.js"
-import { registerUser ,updateAvatar ,  login ,updateProfile , logout , verifyEmail ,getCurrentUser , changePassword , forgotPassword , resetPassword , resendEmailVerification ,refreshAccessToken } from "../controllers/auth.controller.js"
+import { registerUser ,updateAvatar ,  login ,updateProfile , logout , verifyEmail ,getCurrentUser , changePassword , forgotPassword , resetPassword , resendEmailVerification ,refreshAccessToken, getPublicProfile } from "../controllers/auth.controller.js"
 import {verifyJWT} from "../middleware/auth.middleware.js"
 import { upload } from "../middleware/multer.middleware.js"
 const router = Router()
@@ -17,6 +17,6 @@ router.route("/change-password").post(userChangeCurrentPasswordValidator() , val
 router.route("/get-profile" ).get(verifyJWT , getCurrentUser)
 router.route("/update-profile").patch(verifyJWT , updateProfile)
 router.route("/update-avatar").patch(verifyJWT , upload.single("avatar") ,updateAvatar ); 
-
+router.route("/profile/:username").get(verifyJWT , getPublicProfile)
 
 export default router

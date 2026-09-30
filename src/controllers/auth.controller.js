@@ -7,6 +7,8 @@ import {User} from "../models/user.models.js"
 import crypto from "crypto"
 import { cloudinary } from "../utils/cloudinary.js"
 import fs from "fs" 
+import { PostStatusEnum } from "../utils/constants.js"
+import { Post } from "../models/post.models.js"
 
 const generateAccessAndRefreshToken = async(userId)=>{
   
@@ -409,4 +411,23 @@ const updateAvatar = asyncHandler(async(req ,res )=>{
     
 
 })
-export {registerUser ,updateProfile,updateAvatar ,  login , logout, verifyEmail , getCurrentUser , resendEmailVerification ,refreshAccessToken , forgotPassword , resetPassword ,changePassword }
+
+const getPublicProfile = asyncHandler(async(req ,res)=>{
+    const {username} = req.params
+    const user = await User.findOne({username}).select("-password -refreshToken -emailVerificationToken -emailVerificationExpiry")
+    if(!user){
+        throw new ApiErrors(404 , "User not found")
+    }
+
+
+
+    const posts = await Post.find({author:user._id , status: PostStatusEnum.PUBLISHED})
+            .populate("author" , "username avatar")
+            .sort({createdAt:-1})
+                
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200 , {user , posts} , "author profile fetched successfully"))
+})
+export {registerUser ,getPublicProfile ,updateProfile,updateAvatar ,  login , logout, verifyEmail , getCurrentUser , resendEmailVerification ,refreshAccessToken , forgotPassword , resetPassword ,changePassword }
