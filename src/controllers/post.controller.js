@@ -6,6 +6,7 @@ import slugify from "slugify"
 import { AvailablepostStatuses, PostStatusEnum } from "../utils/constants.js";
 import mongoose from "mongoose";
 import { cloudinary } from "../utils/cloudinary.js";
+import fs from "fs"
 
 
 const createPost = asyncHandler(async(req ,res)=>{
@@ -20,6 +21,8 @@ const createPost = asyncHandler(async(req ,res)=>{
         throw new ApiErrors(500 , "File not uploaded")
 
     }
+    fs.unlinkSync(file.path)
+    
 
 
     let slug = slugify(title , {
@@ -192,6 +195,7 @@ const updatePost = asyncHandler(async(req ,res)=>{
             url:response.secure_url ,
             publicId: response.public_id
         })
+        fs.unlinkSync(file.path)
     }
     
 
@@ -226,6 +230,7 @@ const deletePost = asyncHandler(async(req ,res)=>{
 
     if(post.coverImage?.publicId)
         {await cloudinary.uploader.destroy(post.coverImage.publicId)}
+        fs.unlinkSync(file.path)
 
     await Post.deleteOne({_id : post._id}) ; 
     return res
